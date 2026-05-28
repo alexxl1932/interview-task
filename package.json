@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "dev": "pnpm --filter frontend --filter backend --parallel dev"
   },
   "keywords": [],
   "author": "",
