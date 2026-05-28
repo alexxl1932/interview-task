@@ -9,5 +9,3 @@ Thumbs.db
 **/.env.local
 **/dist/
 .DS_Store
-
-/docs/
