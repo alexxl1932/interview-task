@@ -6,51 +6,36 @@ const WEATHER_REGIONS = getWeatherRegions()
 
 function App() {
   const [regionCode, setRegionCode] = useState('HK')
-  const [language, setLanguage] = useState('tc')
+  const [language, setLanguage] = useState('en')
   const [rawWeather, setRawWeather] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(null)
+  const [retryCount, setRetryCount] = useState(0)
 
   const selectedRegion = useMemo(
     () => WEATHER_REGIONS.find((region) => region.code === regionCode) ?? WEATHER_REGIONS[0],
     [regionCode],
   )
   const supportsLanguage = Boolean(selectedRegion.languages?.length)
+  const isLoading = !rawWeather && !error
 
   useEffect(() => {
-    let isActive = true
+    let cancelled = false
 
-    async function loadWeather() {
-      setIsLoading(true)
-      setError('')
+    getWeather({
+      region: regionCode,
+      lang: supportsLanguage ? language : undefined,
+    }).then((data) => {
+      if (cancelled) return
+      setRawWeather(data.weather)
+      setError(null)
+    }).catch((err) => {
+      if (cancelled) return
+      const errorObj = typeof err === 'object' && err !== null ? err : { message: String(err) }
+      setError({ message: errorObj.message ?? 'Failed to load weather', status: errorObj.status ?? 0 })
+    })
 
-      try {
-        const data = await getWeather({
-          region: regionCode,
-          lang: supportsLanguage ? language : undefined,
-        })
-
-        if (isActive) {
-          setRawWeather(data.weather)
-        }
-      } catch (err) {
-        if (isActive) {
-          setError(err instanceof Error ? err.message : 'Failed to load weather')
-          setRawWeather(null)
-        }
-      } finally {
-        if (isActive) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    loadWeather()
-
-    return () => {
-      isActive = false
-    }
-  }, [regionCode, language, supportsLanguage])
+    return () => { cancelled = true }
+  }, [regionCode, language, supportsLanguage, retryCount])
 
   return (
     <WeatherShell
@@ -62,6 +47,7 @@ function App() {
       regions={WEATHER_REGIONS}
       onLanguageChange={setLanguage}
       onRegionChange={setRegionCode}
+      onRetry={() => setRetryCount((c) => c + 1)}
     />
   )
 }

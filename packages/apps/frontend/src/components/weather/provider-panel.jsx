@@ -12,10 +12,6 @@ export function ProviderPanel({ region }) {
           <dt className="text-muted-foreground">Language API</dt>
           <dd className="font-medium">{region.languages?.length ? 'Supported' : 'Not supported'}</dd>
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <dt className="text-muted-foreground">Status</dt>
-          <dd className="font-medium">Mock data</dd>
-        </div>
       </dl>
     </aside>
   )

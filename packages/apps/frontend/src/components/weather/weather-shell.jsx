@@ -11,6 +11,7 @@ export function WeatherShell({
   regions,
   onLanguageChange,
   onRegionChange,
+  onRetry,
 }) {
   return (
     <main className="min-h-svh bg-background text-foreground">
@@ -38,6 +39,7 @@ export function WeatherShell({
             language={language}
             rawWeather={rawWeather}
             region={region}
+            onRetry={onRetry}
           />
           <ProviderPanel region={region} />
         </section>
