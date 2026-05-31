@@ -1,21 +1,24 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { WeatherShell } from '@/components/weather/weather-shell'
 import { getWeather, getWeatherRegions } from '@/services/weather-service'
+import { useWeatherParams } from '@/lib/use-weather-params'
 
 const WEATHER_REGIONS = getWeatherRegions()
 
 function App() {
-  const [regionCode, setRegionCode] = useState('HK')
-  const [language, setLanguage] = useState('en')
+  const {
+    regionCode,
+    language,
+    selectedRegion,
+    supportsLanguage,
+    handleRegionChange,
+    handleLanguageChange,
+  } = useWeatherParams()
+
   const [rawWeather, setRawWeather] = useState(null)
   const [error, setError] = useState(null)
   const [retryCount, setRetryCount] = useState(0)
 
-  const selectedRegion = useMemo(
-    () => WEATHER_REGIONS.find((region) => region.code === regionCode) ?? WEATHER_REGIONS[0],
-    [regionCode],
-  )
-  const supportsLanguage = Boolean(selectedRegion.languages?.length)
   const isLoading = !rawWeather && !error
 
   useEffect(() => {
@@ -45,8 +48,8 @@ function App() {
       rawWeather={rawWeather}
       region={selectedRegion}
       regions={WEATHER_REGIONS}
-      onLanguageChange={setLanguage}
-      onRegionChange={setRegionCode}
+      onLanguageChange={handleLanguageChange}
+      onRegionChange={handleRegionChange}
       onRetry={() => setRetryCount((c) => c + 1)}
     />
   )
